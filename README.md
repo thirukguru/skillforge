@@ -17,6 +17,38 @@
 
 ---
 
+## Features
+
+- **Auto-discovery** — crawls your home directory for every supported tool (no setup on macOS).
+- **Live file watching** — external edits show up instantly.
+- **Skills, Agents & Rules** — rules are first-class; Cursor `.mdc` `globs` / `alwaysApply` shown as badges.
+- **Editor + live preview** — CodeMirror markdown editor with a rendered preview a keystroke away.
+- **Full-text search** — across names, descriptions, and content (`⌘K`).
+- **Collections** — group skills into named, icon-tagged collections (stored in-app, never touching your files).
+- **Favorites** — star skills for quick access.
+- **Copy across tools** — share one skill into another tool's directory in a click.
+- **Keyboard-first** — see the shortcuts below.
+- **Dark / Light / System** themes.
+- **Token & word count** — live in the status bar, for prompt-budget awareness.
+
+## Supported tools
+
+Claude Code · Cursor · Codex · Windsurf · Amp · Antigravity · OpenCode · Claude Desktop · Global Agents
+
+## Keyboard shortcuts
+
+| Action | Shortcut |
+|---|---|
+| Search | `⌘K` / `Ctrl+K` |
+| Edit mode | `⌘E` |
+| Preview mode | `⌘P` |
+| Save | `⌘S` |
+| Open Settings | `⌘,` |
+| Delete (confirms) | `⌘⌫` |
+| Close Settings | `Esc` |
+
+---
+
 ## Prerequisites
 
 - **Node.js ≥ 22.12** (Electron 43 requires it) and npm
