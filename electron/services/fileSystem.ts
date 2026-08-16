@@ -70,35 +70,22 @@ export async function copySkillToTool(
   return targetPath;
 }
 
-export async function createSkillFile(toolId: string, name: string, type: 'skill' | 'agent'): Promise<string> {
-  // Determine appropriate directory based on toolId and type
-  const homeDir = os.homedir();
-  let subDir = '';
-  
-  // This could be imported from a shared config with fileScanner, 
-  // but keeping it simple for now as an example mapping
-  if (toolId === 'claude-code') subDir = type === 'skill' ? '.claude/skills' : '.claude/agents';
-  else if (toolId === 'cursor') subDir = type === 'skill' ? '.cursor/skills' : '.cursor/agents';
-  else if (toolId === 'codex') subDir = type === 'skill' ? '.codex/skills' : '.codex/agents';
-  else if (toolId === 'windsurf') subDir = '.codeium/windsurf/memories'; // fallback
-  else subDir = '.agents/skills'; // global fallback
-
-  const targetDir = path.join(homeDir, subDir);
+export async function createSkillFile(toolId: string, name: string, type: SkillType): Promise<string> {
+  // Resolve the destination from the same table the scanner uses, so the new
+  // file lands where it will be re-discovered (also handles rule directories).
+  const subDir = getToolWriteSubDir(toolId, type) ?? '.agents/skills';
+  const targetDir = path.join(os.homedir(), subDir);
   const safeName = name.replace(/[^a-zA-Z0-9_-]/g, '-').toLowerCase();
-  
-  // Extension logic: use .mdc for cursor if preferred, else .md
-  const ext = (toolId === 'cursor' && type === 'skill') ? '.mdc' : '.md';
+
+  // Cursor skills and rules use the .mdc format; everything else is .md.
+  const ext = (toolId === 'cursor' && (type === 'skill' || type === 'rule')) ? '.mdc' : '.md';
   const filePath = path.join(targetDir, `${safeName}${ext}`);
 
-  const content = `---
-name: ${name}
-description: A new ${type} for ${toolId}
----
-
-# ${name}
-
-Write your instructions here.
-`;
+  // Rules carry different frontmatter (globs / alwaysApply) than skills/agents.
+  const frontmatter = type === 'rule'
+    ? `---\ndescription: A new rule\nglobs:\nalwaysApply: false\n---`
+    : `---\nname: ${name}\ndescription: A new ${type} for ${toolId}\n---`;
+  const content = `${frontmatter}\n\n# ${name}\n\nWrite your instructions here.\n`;
 
   // Make sure we don't overwrite if it already exists
   try {

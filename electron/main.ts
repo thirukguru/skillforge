@@ -72,7 +72,7 @@ function setupIpcHandlers() {
     await deleteSkillFile(filePath);
   });
 
-  ipcMain.handle('create-skill-file', async (_event, toolId: string, name: string, type: 'skill' | 'agent') => {
+  ipcMain.handle('create-skill-file', async (_event, toolId: string, name: string, type: 'skill' | 'agent' | 'rule') => {
     return await createSkillFile(toolId, name, type);
   });
 

@@ -12,7 +12,7 @@ const MOD = navigator.platform.toUpperCase().includes('MAC') ? '⌘' : 'Ctrl+';
 export function EditorToolbar() {
   const {
     selectedSkill, toggleFavorite, isFavorite,
-    collections, addCollection, addSkillToCollection, removeSkillFromCollection,
+    collections, addSkillToCollection, removeSkillFromCollection,
   } = useAppStore();
   const { mode, setMode, isDirty } = useEditorStore();
 
@@ -27,16 +27,6 @@ export function EditorToolbar() {
     } else {
       addSkillToCollection(collectionId, selectedSkill.id);
     }
-  };
-
-  const handleNewCollectionForSkill = () => {
-    const name = window.prompt('New collection name:');
-    if (!name || !name.trim()) return;
-    addCollection(name.trim());
-    // The newly added collection is the last one in the array.
-    const list = useAppStore.getState().collections;
-    const created = list[list.length - 1];
-    if (created) addSkillToCollection(created.id, selectedSkill.id);
   };
 
   const handleCopyTo = async (targetToolId: string) => {
@@ -217,13 +207,6 @@ export function EditorToolbar() {
                   </DropdownMenu.Item>
                 );
               })}
-              <DropdownMenu.Separator className="my-1 h-px bg-[var(--border-2)]" />
-              <DropdownMenu.Item
-                onSelect={(e) => { e.preventDefault(); handleNewCollectionForSkill(); }}
-                className="flex items-center gap-2 px-2 py-1.5 text-sm text-emerald-400 rounded outline-none cursor-pointer data-[highlighted]:bg-[var(--surface-2)]"
-              >
-                <FolderPlus size={14} /> New collection…
-              </DropdownMenu.Item>
             </DropdownMenu.Content>
           </DropdownMenu.Portal>
         </DropdownMenu.Root>

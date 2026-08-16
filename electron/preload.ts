@@ -9,7 +9,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   readFile: (filePath: string) => ipcRenderer.invoke('read-file', filePath),
   writeFile: (filePath: string, content: string) => ipcRenderer.invoke('write-file', filePath, content),
   deleteFile: (filePath: string) => ipcRenderer.invoke('delete-file', filePath),
-  createSkillFile: (toolId: string, name: string, type: 'skill' | 'agent') =>
+  createSkillFile: (toolId: string, name: string, type: 'skill' | 'agent' | 'rule') =>
     ipcRenderer.invoke('create-skill-file', toolId, name, type),
   copySkillToTool: (sourcePath: string, targetToolId: string, type: 'skill' | 'agent' | 'rule') =>
     ipcRenderer.invoke('copy-skill-to-tool', sourcePath, targetToolId, type),

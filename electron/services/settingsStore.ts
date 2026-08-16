@@ -5,6 +5,7 @@ export interface Collection {
   id: string;
   name: string;
   skillIds: string[];
+  icon?: string;
 }
 
 export interface AppSettings {

@@ -28,6 +28,7 @@ export interface Collection {
   id: string;
   name: string;
   skillIds: string[];
+  icon?: string;
 }
 
 export interface AppSettings {
@@ -49,7 +50,7 @@ export interface ElectronAPI {
   readFile: (filePath: string) => Promise<string>;
   writeFile: (filePath: string, content: string) => Promise<void>;
   deleteFile: (filePath: string) => Promise<void>;
-  createSkillFile: (toolId: string, name: string, type: 'skill' | 'agent') => Promise<string>;
+  createSkillFile: (toolId: string, name: string, type: SkillType) => Promise<string>;
   copySkillToTool: (sourcePath: string, targetToolId: string, type: SkillType) => Promise<string>;
   
   // File watching

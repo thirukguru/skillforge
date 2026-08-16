@@ -5,6 +5,17 @@ import { useAppStore } from '../../stores/appStore';
 import { TOOL_SOURCES, getToolColor } from '../../lib/toolSources';
 import { cn } from '../../lib/utils';
 
+const MOD = navigator.platform.toUpperCase().includes('MAC') ? '⌘' : 'Ctrl';
+const SHORTCUTS: { label: string; keys: string }[] = [
+  { label: 'Search skills', keys: `${MOD} K` },
+  { label: 'Edit mode', keys: `${MOD} E` },
+  { label: 'Preview mode', keys: `${MOD} P` },
+  { label: 'Save', keys: `${MOD} S` },
+  { label: 'Open Settings', keys: `${MOD} ,` },
+  { label: 'Delete skill (confirms)', keys: `${MOD} ⌫` },
+  { label: 'Close Settings', keys: 'Esc' },
+];
+
 export default function SettingsPage() {
   const { settings, updateSettings } = useSettingsStore();
   const { skills, scanForSkills } = useAppStore();
@@ -147,38 +158,22 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm text-[var(--text-secondary)] mb-2">Editor Font Size</label>
-                <div className="flex items-center gap-3">
-                  <input 
-                    type="range" 
-                    min="12" 
-                    max="24"
-                    value={settings?.fontSize || 14}
-                    onChange={(e) => updateSettings({ fontSize: parseInt(e.target.value) })}
-                    className="flex-1 accent-emerald-500"
-                  />
-                  <span className="text-sm font-mono bg-[var(--surface-1)] px-2 py-1 rounded w-10 text-center">
-                    {settings?.fontSize || 14}
-                  </span>
-                </div>
-              </div>
+            {/* Editor font size / family are temporarily hidden — revisit later. */}
+          </div>
+        </section>
 
-              <div>
-                <label className="block text-sm text-[var(--text-secondary)] mb-2">Editor Font Family</label>
-                <select 
-                  value={settings?.editorFont || 'monospace'}
-                  onChange={(e) => updateSettings({ editorFont: e.target.value })}
-                  className="w-full bg-[var(--surface-1)] border border-[var(--border-2)] rounded-md px-3 py-2 text-sm text-[var(--text-primary)] focus:outline-none focus:border-emerald-500/50 appearance-none"
-                >
-                  <option value="monospace">System Monospace</option>
-                  <option value="'JetBrains Mono', monospace">JetBrains Mono</option>
-                  <option value="'Fira Code', monospace">Fira Code</option>
-                  <option value="'Source Code Pro', monospace">Source Code Pro</option>
-                </select>
+        {/* Keyboard Shortcuts */}
+        <section className="bg-[var(--bg-tertiary)] border border-[var(--border-1)] rounded-xl p-6">
+          <h2 className="text-lg font-medium mb-4">Keyboard Shortcuts</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-1">
+            {SHORTCUTS.map(({ label, keys }) => (
+              <div key={label} className="flex items-center justify-between py-1.5 border-b border-[var(--border-1)]">
+                <span className="text-sm text-[var(--text-secondary)]">{label}</span>
+                <kbd className="text-xs font-mono bg-[var(--surface-1)] border border-[var(--border-2)] rounded px-2 py-1 text-[var(--text-primary)]">
+                  {keys}
+                </kbd>
               </div>
-            </div>
+            ))}
           </div>
         </section>
 

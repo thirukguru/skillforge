@@ -4,6 +4,8 @@ import SkillList from './components/layout/SkillList';
 import { DetailPanel } from './components/layout/DetailPanel';
 import StatusBar from './components/layout/StatusBar';
 import { NewSkillDialog } from './components/skills/NewSkillDialog';
+import { CollectionDialog } from './components/collections/CollectionDialog';
+import { RegistryDialog } from './components/registry/RegistryDialog';
 import { useAppStore } from './stores/appStore';
 import { useEditorStore } from './stores/editorStore';
 import { useSettingsStore } from './stores/settingsStore';
@@ -15,7 +17,10 @@ function App() {
   const {
     scanForSkills,
     isScanning,
-    showNewSkillDialog,
+    createDialog,
+    editCollection,
+    setCreateDialog,
+    setEditCollection,
     hydrateFromSettings
   } = useAppStore();
 
@@ -116,8 +121,13 @@ function App() {
       {/* Status Bar */}
       <StatusBar />
 
-      {/* Dialogs */}
-      {showNewSkillDialog && <NewSkillDialog />}
+      {/* Dialogs (driven by the top-bar + menu) */}
+      {(createDialog === 'skill' || createDialog === 'agent' || createDialog === 'rule') && <NewSkillDialog />}
+      {createDialog === 'collection' && <CollectionDialog onClose={() => setCreateDialog(null)} />}
+      {createDialog === 'registry' && <RegistryDialog />}
+      {editCollection && (
+        <CollectionDialog collection={editCollection} onClose={() => setEditCollection(null)} />
+      )}
     </div>
   );
 }

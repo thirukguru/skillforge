@@ -3,6 +3,15 @@
   "private": true,
   "version": "1.0.0",
   "description": "Your AI agent skills, finally organized. A cross-platform app to browse, edit, and manage skills across Claude Code, Cursor, Codex, Windsurf, and more.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thirukguru/skillforge.git"
+  },
+  "author": {
+    "name": "thirukguru",
+    "email": "thirukguru@users.noreply.github.com"
+  },
+  "license": "MIT",
   "main": "dist-electron/main.js",
   "type": "module",
   "scripts": {
@@ -11,10 +20,10 @@
     "dev:electron": "npm run compile:electron && concurrently \"npm run dev\" \"wait-on http://localhost:5173 && cross-env NODE_ENV=development electron .\"",
     "build": "tsc -b && vite build",
     "build:electron": "npm run build && npm run compile:electron",
-    "build:mac": "npm run build:electron && electron-builder --mac",
-    "build:win": "npm run build:electron && electron-builder --win",
-    "build:linux": "npm run build:electron && electron-builder --linux",
-    "build:all": "npm run build:electron && electron-builder --mac --win --linux",
+    "build:mac": "npm run build:electron && electron-builder --mac --publish never",
+    "build:win": "npm run build:electron && electron-builder --win --publish never",
+    "build:linux": "npm run build:electron && electron-builder --linux --publish never",
+    "build:all": "npm run build:electron && electron-builder --mac --win --linux --publish never",
     "lint": "oxlint",
     "preview": "vite preview"
   },

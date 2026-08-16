@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import { Search } from 'lucide-react';
 import SkillCard from '../skills/SkillCard';
+import { CreateMenu } from './CreateMenu';
 import { useAppStore } from '../../stores/appStore';
 import { TOOL_SOURCES } from '../../lib/toolSources';
 
@@ -48,9 +49,12 @@ export default function SkillList() {
   return (
     <div className="w-72 h-full bg-[var(--bg-tertiary)] border-r border-[var(--border-1)] flex flex-col">
       <div className="p-4 border-b border-[var(--border-1)]">
-        <h2 className="text-sm font-semibold text-[var(--text-primary)] mb-3">
-          {getFilterName()}
-        </h2>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-semibold text-[var(--text-primary)]">
+            {getFilterName()}
+          </h2>
+          <CreateMenu />
+        </div>
         <div className="relative">
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-tertiary)]" />
           <input

@@ -3,6 +3,9 @@ import type { ScannedSkill, Collection, AppSettings } from '../types/electron';
 
 type FilterMode = 'all-skills' | 'all-agents' | 'favorites' | string;
 
+// Which create dialog is open (from the top-bar + menu). null = none.
+export type CreateDialog = 'skill' | 'agent' | 'rule' | 'collection' | 'registry';
+
 interface AppState {
   // Data
   skills: ScannedSkill[];
@@ -17,7 +20,8 @@ interface AppState {
   // UI State
   isScanning: boolean;
   showSettings: boolean;
-  showNewSkillDialog: boolean;
+  createDialog: CreateDialog | null;
+  editCollection: Collection | null;
 
   // Actions
   setSkills: (skills: ScannedSkill[]) => void;
@@ -26,10 +30,12 @@ interface AppState {
   setSearchQuery: (query: string) => void;
   setIsScanning: (scanning: boolean) => void;
   setShowSettings: (show: boolean) => void;
-  setShowNewSkillDialog: (show: boolean) => void;
+  setCreateDialog: (dialog: CreateDialog | null) => void;
+  setEditCollection: (collection: Collection | null) => void;
   toggleFavorite: (skillId: string) => void;
   isFavorite: (skillId: string) => boolean;
-  addCollection: (name: string) => void;
+  addCollection: (name: string, icon?: string) => void;
+  renameCollection: (id: string, name: string, icon?: string) => void;
   removeCollection: (id: string) => void;
   addSkillToCollection: (collectionId: string, skillId: string) => void;
   removeSkillFromCollection: (collectionId: string, skillId: string) => void;
@@ -61,7 +67,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   searchQuery: '',
   isScanning: false,
   showSettings: false,
-  showNewSkillDialog: false,
+  createDialog: null,
+  editCollection: null,
 
   setSkills: (skills) => set({ skills }),
   // Selecting a skill also leaves the settings view so the editor is visible.
@@ -70,7 +77,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   setSearchQuery: (searchQuery) => set({ searchQuery }),
   setIsScanning: (isScanning) => set({ isScanning }),
   setShowSettings: (showSettings) => set({ showSettings }),
-  setShowNewSkillDialog: (showNewSkillDialog) => set({ showNewSkillDialog }),
+  setCreateDialog: (createDialog) => set({ createDialog }),
+  setEditCollection: (editCollection) => set({ editCollection }),
 
   toggleFavorite: (skillId) => set((state) => {
     const newFavorites = new Set(state.favorites);
@@ -87,12 +95,21 @@ export const useAppStore = create<AppState>((set, get) => ({
     return get().favorites.has(skillId);
   },
 
-  addCollection: (name) => set((state) => {
+  addCollection: (name, icon) => set((state) => {
     const collections = [...state.collections, {
       id: crypto.randomUUID(),
       name,
+      icon: icon || 'Folder',
       skillIds: []
     }];
+    persistUserData(state.favorites, collections);
+    return { collections };
+  }),
+
+  renameCollection: (id, name, icon) => set((state) => {
+    const collections = state.collections.map(c =>
+      c.id === id ? { ...c, name, ...(icon ? { icon } : {}) } : c
+    );
     persistUserData(state.favorites, collections);
     return { collections };
   }),

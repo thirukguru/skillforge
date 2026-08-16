@@ -2,30 +2,36 @@ import React, { useState } from 'react';
 import { useAppStore } from '../../stores/appStore';
 import { TOOL_SOURCES } from '../../lib/toolSources';
 
+const TYPE_LABEL: Record<string, string> = { skill: 'Skill', agent: 'Agent', rule: 'Rule' };
+
 export function NewSkillDialog() {
-  const { setShowNewSkillDialog, scanForSkills } = useAppStore();
+  const { createDialog, setCreateDialog, scanForSkills } = useAppStore();
   const [name, setName] = useState('');
-  const [source, setSource] = useState(TOOL_SOURCES[0]?.id || 'user');
-  const [type, setType] = useState<'skill' | 'agent'>('skill');
+  const [source, setSource] = useState(TOOL_SOURCES[0]?.id || 'claude-code');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // This dialog only handles skill/agent/rule creation.
+  if (createDialog !== 'skill' && createDialog !== 'agent' && createDialog !== 'rule') return null;
+  const type = createDialog;
+  const label = TYPE_LABEL[type];
+
+  const close = () => setCreateDialog(null);
 
   const handleCreate = async () => {
     if (!name.trim()) return;
-    
     setIsSubmitting(true);
     try {
-      if (window.electronAPI && window.electronAPI.createSkillFile) {
-        await window.electronAPI.createSkillFile(source, name, type);
-      }
-      if (scanForSkills) {
+      if (window.electronAPI?.createSkillFile) {
+        const filePath = await window.electronAPI.createSkillFile(source, name.trim(), type);
         await scanForSkills();
+        // Select the freshly created file so it opens in the editor.
+        const created = useAppStore.getState().skills.find(s => s.filePath === filePath);
+        if (created) useAppStore.getState().selectSkill(created);
       }
-      if (setShowNewSkillDialog) {
-        setShowNewSkillDialog(false);
-      }
+      close();
     } catch (error) {
-      console.error('Failed to create skill:', error);
-      alert('Failed to create skill. See console for details.');
+      console.error('Failed to create:', error);
+      alert(`Failed to create ${label.toLowerCase()}: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -33,65 +39,32 @@ export function NewSkillDialog() {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop */}
-      <div 
+      <div
         className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
-        onClick={() => setShowNewSkillDialog && setShowNewSkillDialog(false)}
+        onClick={close}
       />
-      
-      {/* Dialog */}
       <div className="relative w-full max-w-md bg-[var(--bg-tertiary)] rounded-xl p-6 border border-[var(--border-2)] shadow-2xl animate-in fade-in zoom-in-95 duration-200">
-        <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-6">Create New Skill</h2>
-        
+        <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-5 text-center">New {label}</h2>
+
         <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1.5">
-              Name
-            </label>
+          <div className="flex items-center gap-3">
+            <label className="w-20 text-sm text-[var(--text-secondary)] flex-shrink-0">{label} name</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Data Analysis"
-              className="w-full bg-black/20 border border-[var(--border-2)] rounded-lg px-3 py-2 text-[var(--text-primary)] placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50"
+              onKeyDown={(e) => { if (e.key === 'Enter') handleCreate(); }}
               autoFocus
+              className="flex-1 bg-[var(--surface-1)] border border-emerald-500/50 rounded-lg px-3 py-2 text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1.5">
-              Type
-            </label>
-            <div className="flex gap-4">
-              <label className="flex items-center gap-2 text-[var(--text-primary)] cursor-pointer">
-                <input
-                  type="radio"
-                  checked={type === 'skill'}
-                  onChange={() => setType('skill')}
-                  className="text-emerald-500 bg-black/20 border-[var(--border-2)] focus:ring-emerald-500/50"
-                />
-                Skill
-              </label>
-              <label className="flex items-center gap-2 text-[var(--text-primary)] cursor-pointer">
-                <input
-                  type="radio"
-                  checked={type === 'agent'}
-                  onChange={() => setType('agent')}
-                  className="text-emerald-500 bg-black/20 border-[var(--border-2)] focus:ring-emerald-500/50"
-                />
-                Agent
-              </label>
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1.5">
-              Source Directory
-            </label>
+          <div className="flex items-center gap-3">
+            <label className="w-20 text-sm text-[var(--text-secondary)] flex-shrink-0">Tool</label>
             <select
               value={source}
               onChange={(e) => setSource(e.target.value)}
-              className="w-full bg-black/20 border border-[var(--border-2)] rounded-lg px-3 py-2 text-[var(--text-primary)] focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50"
+              className="flex-1 bg-[var(--surface-1)] border border-[var(--border-2)] rounded-lg px-3 py-2 text-[var(--text-primary)] focus:outline-none focus:border-emerald-500/50"
             >
               {TOOL_SOURCES.map((src) => (
                 <option key={src.id} value={src.id}>{src.name}</option>
@@ -100,20 +73,20 @@ export function NewSkillDialog() {
           </div>
         </div>
 
-        <div className="mt-8 flex justify-end gap-3">
+        <div className="mt-7 flex justify-between gap-3">
           <button
-            onClick={() => setShowNewSkillDialog && setShowNewSkillDialog(false)}
-            className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-[var(--text-primary)] transition-colors"
+            onClick={close}
             disabled={isSubmitting}
+            className="px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--surface-1)] hover:bg-[var(--surface-2)] rounded-lg transition-colors"
           >
             Cancel
           </button>
           <button
             onClick={handleCreate}
             disabled={!name.trim() || isSubmitting}
-            className="px-4 py-2 text-sm font-medium bg-emerald-500 text-[var(--text-primary)] rounded-lg hover:bg-emerald-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-5 py-2 text-sm font-medium bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            {isSubmitting ? 'Creating...' : 'Create'}
+            {isSubmitting ? 'Creating…' : 'Create'}
           </button>
         </div>
       </div>
