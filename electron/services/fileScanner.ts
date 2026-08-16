@@ -3,6 +3,8 @@ import * as path from 'path';
 import * as yaml from 'js-yaml';
 import * as os from 'os';
 
+export type SkillType = 'skill' | 'agent' | 'rule';
+
 export interface ScannedSkill {
   id: string;
   name: string;
@@ -12,16 +14,19 @@ export interface ScannedSkill {
   filePath: string;
   realPath: string;
   toolSource: string;
-  type: 'skill' | 'agent';
+  type: SkillType;
   tags: string[];
   fileSize: number;
   lastModified: number;
+  // Rule-specific frontmatter (Cursor .mdc), when present.
+  globs?: string[];
+  alwaysApply?: boolean;
 }
 
 interface ToolConfig {
   id: string;
   name: string;
-  paths: { subDir: string; type: 'skill' | 'agent' }[];
+  paths: { subDir: string; type: SkillType }[];
   platformFilter?: string[];
 }
 
@@ -39,7 +44,7 @@ const TOOLS: ToolConfig[] = [
     name: 'Cursor',
     paths: [
       { subDir: '.cursor/skills', type: 'skill' },
-      { subDir: '.cursor/rules', type: 'skill' }, // treat rules as skills
+      { subDir: '.cursor/rules', type: 'rule' },
       { subDir: '.cursor/agents', type: 'agent' }
     ]
   },
@@ -56,7 +61,7 @@ const TOOLS: ToolConfig[] = [
     name: 'Windsurf',
     paths: [
       { subDir: '.codeium/windsurf/memories', type: 'skill' },
-      { subDir: '.windsurf/rules', type: 'skill' }
+      { subDir: '.windsurf/rules', type: 'rule' }
     ]
   },
   {
@@ -103,7 +108,7 @@ const TOOLS: ToolConfig[] = [
  * scanning, so copies land where the scanner will find them. Prefers the first
  * path matching the type, then falls back to the tool's first path.
  */
-export function getToolWriteSubDir(toolId: string, type: 'skill' | 'agent'): string | null {
+export function getToolWriteSubDir(toolId: string, type: SkillType): string | null {
   const tool = TOOLS.find(t => t.id === toolId);
   if (!tool || tool.paths.length === 0) return null;
   const match = tool.paths.find(p => p.type === type) ?? tool.paths[0];
@@ -114,7 +119,7 @@ function generateId(realPath: string): string {
   return Buffer.from(realPath).toString('base64').replace(/[^a-zA-Z0-9]/g, '');
 }
 
-async function scanDirectory(dir: string, toolId: string, type: 'skill' | 'agent', scannedMap: Map<string, ScannedSkill>) {
+async function scanDirectory(dir: string, toolId: string, type: SkillType, scannedMap: Map<string, ScannedSkill>) {
   try {
     const files = await fs.promises.readdir(dir, { withFileTypes: true });
     
@@ -137,6 +142,8 @@ async function scanDirectory(dir: string, toolId: string, type: 'skill' | 'agent
           let description = '';
           let tags: string[] = [];
           let content = rawContent;
+          let globs: string[] | undefined;
+          let alwaysApply: boolean | undefined;
 
           // Simple Frontmatter parser for markdown (.md) and cursor (.mdc)
           const frontmatterRegex = /^---\n([\s\S]*?)\n---/;
@@ -148,6 +155,13 @@ async function scanDirectory(dir: string, toolId: string, type: 'skill' | 'agent
                 if (fm.name) name = fm.name;
                 if (fm.description) description = fm.description;
                 if (fm.tags) tags = Array.isArray(fm.tags) ? fm.tags : [fm.tags];
+                // Rule-specific (Cursor .mdc) frontmatter.
+                if (fm.globs !== undefined && fm.globs !== null && fm.globs !== '') {
+                  globs = Array.isArray(fm.globs)
+                    ? fm.globs.map(String)
+                    : String(fm.globs).split(',').map((g: string) => g.trim()).filter(Boolean);
+                }
+                if (typeof fm.alwaysApply === 'boolean') alwaysApply = fm.alwaysApply;
               }
             } catch (e) {
               // Failed to parse YAML, keep defaults
@@ -167,7 +181,9 @@ async function scanDirectory(dir: string, toolId: string, type: 'skill' | 'agent
             type,
             tags,
             fileSize: stats.size,
-            lastModified: stats.mtimeMs
+            lastModified: stats.mtimeMs,
+            globs,
+            alwaysApply
           });
         } catch (err) {
           console.error(`Error processing file ${fullPath}:`, err);

@@ -64,7 +64,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   showNewSkillDialog: false,
 
   setSkills: (skills) => set({ skills }),
-  selectSkill: (selectedSkill) => set({ selectedSkill }),
+  // Selecting a skill also leaves the settings view so the editor is visible.
+  selectSkill: (selectedSkill) => set({ selectedSkill, showSettings: false }),
   setFilterMode: (filterMode) => set({ filterMode }),
   setSearchQuery: (searchQuery) => set({ searchQuery }),
   setIsScanning: (isScanning) => set({ isScanning }),
@@ -138,6 +139,8 @@ export const useAppStore = create<AppState>((set, get) => ({
       filtered = filtered.filter(s => s.type === 'skill');
     } else if (filterMode === 'all-agents') {
       filtered = filtered.filter(s => s.type === 'agent');
+    } else if (filterMode === 'all-rules') {
+      filtered = filtered.filter(s => s.type === 'rule');
     } else if (filterMode === 'favorites') {
       filtered = filtered.filter(s => favorites.has(s.id));
     } else if (filterMode.startsWith('collection:')) {

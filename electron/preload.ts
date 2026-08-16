@@ -11,7 +11,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   deleteFile: (filePath: string) => ipcRenderer.invoke('delete-file', filePath),
   createSkillFile: (toolId: string, name: string, type: 'skill' | 'agent') =>
     ipcRenderer.invoke('create-skill-file', toolId, name, type),
-  copySkillToTool: (sourcePath: string, targetToolId: string, type: 'skill' | 'agent') =>
+  copySkillToTool: (sourcePath: string, targetToolId: string, type: 'skill' | 'agent' | 'rule') =>
     ipcRenderer.invoke('copy-skill-to-tool', sourcePath, targetToolId, type),
   
   // File watching

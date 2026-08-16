@@ -17,12 +17,12 @@ export default function StatusBar() {
   const tokens = estimateTokens(activeContent);
 
   return (
-    <div className="h-7 w-full bg-[#16171b] border-t border-white/5 flex items-center justify-between px-4 text-xs text-white/40 select-none flex-shrink-0">
+    <div className="h-7 w-full bg-[var(--bg-secondary)] border-t border-[var(--border-1)] flex items-center justify-between px-4 text-xs text-[var(--text-tertiary)] select-none flex-shrink-0">
       <div className="flex items-center gap-4">
         <span>Watching {toolDirs} tool{toolDirs !== 1 ? 's' : ''}</span>
-        <span className="text-white/10">·</span>
+        <span className="text-[var(--border-2)]">·</span>
         <span>{skillsCount} skills</span>
-        <span className="text-white/10">·</span>
+        <span className="text-[var(--border-2)]">·</span>
         <span>{agentsCount} agents</span>
       </div>
 
@@ -30,9 +30,9 @@ export default function StatusBar() {
         {selectedSkill && (
           <>
             <span title="Word count">{formatCount(words)} word{words !== 1 ? 's' : ''}</span>
-            <span className="text-white/10">·</span>
+            <span className="text-[var(--border-2)]">·</span>
             <span title="Estimated token count (~4 chars/token)">~{formatCount(tokens)} tokens</span>
-            <span className="text-white/10">·</span>
+            <span className="text-[var(--border-2)]">·</span>
           </>
         )}
         {isScanning ? (

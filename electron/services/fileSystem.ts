@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import * as crypto from 'crypto';
-import { getToolWriteSubDir } from './fileScanner';
+import { getToolWriteSubDir, type SkillType } from './fileScanner';
 
 export async function readSkillFile(filePath: string): Promise<string> {
   return await fs.promises.readFile(filePath, 'utf8');
@@ -57,7 +57,7 @@ async function uniquePath(desired: string): Promise<string> {
 export async function copySkillToTool(
   sourcePath: string,
   targetToolId: string,
-  type: 'skill' | 'agent'
+  type: SkillType
 ): Promise<string> {
   const subDir = getToolWriteSubDir(targetToolId, type);
   if (!subDir) {

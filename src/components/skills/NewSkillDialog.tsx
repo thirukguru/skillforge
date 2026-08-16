@@ -40,8 +40,8 @@ export function NewSkillDialog() {
       />
       
       {/* Dialog */}
-      <div className="relative w-full max-w-md bg-[#1e1f23] rounded-xl p-6 border border-white/10 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
-        <h2 className="text-xl font-semibold text-white mb-6">Create New Skill</h2>
+      <div className="relative w-full max-w-md bg-[var(--bg-tertiary)] rounded-xl p-6 border border-[var(--border-2)] shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+        <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-6">Create New Skill</h2>
         
         <div className="space-y-4">
           <div>
@@ -53,7 +53,7 @@ export function NewSkillDialog() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Data Analysis"
-              className="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-white placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50"
+              className="w-full bg-black/20 border border-[var(--border-2)] rounded-lg px-3 py-2 text-[var(--text-primary)] placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50"
               autoFocus
             />
           </div>
@@ -63,21 +63,21 @@ export function NewSkillDialog() {
               Type
             </label>
             <div className="flex gap-4">
-              <label className="flex items-center gap-2 text-white cursor-pointer">
+              <label className="flex items-center gap-2 text-[var(--text-primary)] cursor-pointer">
                 <input
                   type="radio"
                   checked={type === 'skill'}
                   onChange={() => setType('skill')}
-                  className="text-emerald-500 bg-black/20 border-white/10 focus:ring-emerald-500/50"
+                  className="text-emerald-500 bg-black/20 border-[var(--border-2)] focus:ring-emerald-500/50"
                 />
                 Skill
               </label>
-              <label className="flex items-center gap-2 text-white cursor-pointer">
+              <label className="flex items-center gap-2 text-[var(--text-primary)] cursor-pointer">
                 <input
                   type="radio"
                   checked={type === 'agent'}
                   onChange={() => setType('agent')}
-                  className="text-emerald-500 bg-black/20 border-white/10 focus:ring-emerald-500/50"
+                  className="text-emerald-500 bg-black/20 border-[var(--border-2)] focus:ring-emerald-500/50"
                 />
                 Agent
               </label>
@@ -91,7 +91,7 @@ export function NewSkillDialog() {
             <select
               value={source}
               onChange={(e) => setSource(e.target.value)}
-              className="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50"
+              className="w-full bg-black/20 border border-[var(--border-2)] rounded-lg px-3 py-2 text-[var(--text-primary)] focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50"
             >
               {TOOL_SOURCES.map((src) => (
                 <option key={src.id} value={src.id}>{src.name}</option>
@@ -103,7 +103,7 @@ export function NewSkillDialog() {
         <div className="mt-8 flex justify-end gap-3">
           <button
             onClick={() => setShowNewSkillDialog && setShowNewSkillDialog(false)}
-            className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white transition-colors"
+            className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-[var(--text-primary)] transition-colors"
             disabled={isSubmitting}
           >
             Cancel
@@ -111,7 +111,7 @@ export function NewSkillDialog() {
           <button
             onClick={handleCreate}
             disabled={!name.trim() || isSubmitting}
-            className="px-4 py-2 text-sm font-medium bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 text-sm font-medium bg-emerald-500 text-[var(--text-primary)] rounded-lg hover:bg-emerald-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? 'Creating...' : 'Create'}
           </button>

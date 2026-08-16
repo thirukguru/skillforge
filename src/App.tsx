@@ -7,6 +7,8 @@ import { NewSkillDialog } from './components/skills/NewSkillDialog';
 import { useAppStore } from './stores/appStore';
 import { useEditorStore } from './stores/editorStore';
 import { useSettingsStore } from './stores/settingsStore';
+import { useTheme } from './hooks/useTheme';
+import { saveCurrentSkill, deleteSelectedSkill } from './lib/skillActions';
 import { Loader2 } from 'lucide-react';
 
 function App() {
@@ -19,6 +21,9 @@ function App() {
 
   const { loadSettings } = useSettingsStore();
   const { setMode } = useEditorStore();
+
+  // Applies the .light / .dark class on <html> from the persisted theme setting.
+  useTheme();
 
   useEffect(() => {
     // 1. Load settings, restore favorites/collections, then conditionally scan
@@ -38,24 +43,50 @@ function App() {
 
     // Keyboard shortcuts
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Cmd/Ctrl + S to save
-      if ((e.metaKey || e.ctrlKey) && e.key === 's') {
-        e.preventDefault();
-        const editorState = useEditorStore.getState();
-        const appState = useAppStore.getState();
-        if (editorState.isDirty && appState.selectedSkill) {
-          if (window.electronAPI && window.electronAPI.writeFile) {
-            window.electronAPI.writeFile(appState.selectedSkill.filePath, editorState.currentContent)
-              .then(() => editorState.markSaved());
-          }
+      const mod = e.metaKey || e.ctrlKey;
+
+      // Escape closes the settings view
+      if (e.key === 'Escape') {
+        if (useAppStore.getState().showSettings) {
+          e.preventDefault();
+          useAppStore.getState().setShowSettings(false);
         }
+        return;
       }
-      
-      // Cmd/Ctrl + E to toggle edit/preview mode
-      if ((e.metaKey || e.ctrlKey) && e.key === 'e') {
-        e.preventDefault();
-        const currentMode = useEditorStore.getState().mode;
-        setMode(currentMode === 'edit' ? 'preview' : 'edit');
+
+      if (!mod) return;
+      const key = e.key.toLowerCase();
+      const { selectedSkill, setShowSettings } = useAppStore.getState();
+
+      switch (key) {
+        case 's': // Save
+          e.preventDefault();
+          saveCurrentSkill();
+          break;
+        case 'e': // Edit mode
+          if (selectedSkill) {
+            e.preventDefault();
+            setShowSettings(false);
+            setMode('edit');
+          }
+          break;
+        case 'p': // Preview mode
+          if (selectedSkill) {
+            e.preventDefault();
+            setShowSettings(false);
+            setMode('preview');
+          }
+          break;
+        case ',': // Open settings (macOS convention)
+          e.preventDefault();
+          setShowSettings(true);
+          break;
+        case 'backspace': // Delete selected skill (always confirms)
+          if (selectedSkill) {
+            e.preventDefault();
+            deleteSelectedSkill();
+          }
+          break;
       }
     };
 
@@ -76,7 +107,7 @@ function App() {
           <div className="absolute inset-0 z-40 bg-black/20 backdrop-blur-[2px] flex items-center justify-center animate-fade-in">
             <div className="glass-card px-6 py-4 flex items-center gap-3 shadow-xl">
               <Loader2 className="w-5 h-5 text-emerald-500 animate-spin" />
-              <span className="text-sm font-medium text-white">Scanning directories...</span>
+              <span className="text-sm font-medium text-[var(--text-primary)]">Scanning directories...</span>
             </div>
           </div>
         )}

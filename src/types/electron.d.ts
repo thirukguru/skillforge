@@ -5,6 +5,8 @@ export interface FileChangeEvent {
   path: string;
 }
 
+export type SkillType = 'skill' | 'agent' | 'rule';
+
 export interface ScannedSkill {
   id: string;
   name: string;
@@ -14,10 +16,12 @@ export interface ScannedSkill {
   filePath: string;
   realPath: string;
   toolSource: string;
-  type: 'skill' | 'agent';
+  type: SkillType;
   tags: string[];
   fileSize: number;
   lastModified: number;
+  globs?: string[];
+  alwaysApply?: boolean;
 }
 
 export interface Collection {
@@ -46,7 +50,7 @@ export interface ElectronAPI {
   writeFile: (filePath: string, content: string) => Promise<void>;
   deleteFile: (filePath: string) => Promise<void>;
   createSkillFile: (toolId: string, name: string, type: 'skill' | 'agent') => Promise<string>;
-  copySkillToTool: (sourcePath: string, targetToolId: string, type: 'skill' | 'agent') => Promise<string>;
+  copySkillToTool: (sourcePath: string, targetToolId: string, type: SkillType) => Promise<string>;
   
   // File watching
   startWatching: (dirs: string[]) => void;

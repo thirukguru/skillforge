@@ -31,6 +31,7 @@ export default function SkillList() {
   const getFilterName = () => {
     if (filterMode === 'all-skills') return 'All Skills';
     if (filterMode === 'all-agents') return 'All Agents';
+    if (filterMode === 'all-rules') return 'All Rules';
     if (filterMode === 'favorites') return 'Favorites';
     if (filterMode.startsWith('collection:')) {
       const colId = filterMode.split(':')[1];
@@ -45,20 +46,20 @@ export default function SkillList() {
   const displayedSkills = getFilteredSkills();
 
   return (
-    <div className="w-72 h-full bg-[#1e1f23] border-r border-white/5 flex flex-col">
-      <div className="p-4 border-b border-white/5">
-        <h2 className="text-sm font-semibold text-white/90 mb-3">
+    <div className="w-72 h-full bg-[var(--bg-tertiary)] border-r border-[var(--border-1)] flex flex-col">
+      <div className="p-4 border-b border-[var(--border-1)]">
+        <h2 className="text-sm font-semibold text-[var(--text-primary)] mb-3">
           {getFilterName()}
         </h2>
         <div className="relative">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-white/30" />
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-tertiary)]" />
           <input
             ref={searchRef}
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search skills... (⌘K)"
-            className="w-full bg-white/5 border border-white/10 rounded-md py-1.5 pl-9 pr-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-emerald-500/50 focus:bg-white/10 transition-colors"
+            className="w-full bg-[var(--surface-1)] border border-[var(--border-2)] rounded-md py-1.5 pl-9 pr-3 text-sm text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:outline-none focus:border-emerald-500/50 focus:bg-[var(--surface-2)] transition-colors"
           />
         </div>
       </div>
@@ -77,7 +78,7 @@ export default function SkillList() {
           </div>
         ) : (
           <div className="p-4 text-center mt-10">
-            <p className="text-sm text-white/40">No results found.</p>
+            <p className="text-sm text-[var(--text-tertiary)]">No results found.</p>
           </div>
         )}
       </div>

@@ -76,7 +76,7 @@ function setupIpcHandlers() {
     return await createSkillFile(toolId, name, type);
   });
 
-  ipcMain.handle('copy-skill-to-tool', async (_event, sourcePath: string, targetToolId: string, type: 'skill' | 'agent') => {
+  ipcMain.handle('copy-skill-to-tool', async (_event, sourcePath: string, targetToolId: string, type: 'skill' | 'agent' | 'rule') => {
     return await copySkillToTool(sourcePath, targetToolId, type);
   });
 

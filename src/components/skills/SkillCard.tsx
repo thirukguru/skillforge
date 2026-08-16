@@ -22,7 +22,7 @@ export default function SkillCard({ skill, isSelected, onClick }: SkillCardProps
         "group relative px-4 py-3 cursor-pointer transition-all border-l-2",
         isSelected 
           ? "bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border-emerald-500" 
-          : "border-transparent hover:bg-white/5"
+          : "border-transparent hover:bg-[var(--surface-1)]"
       )}
     >
       <div className="flex items-start justify-between gap-2">
@@ -34,12 +34,12 @@ export default function SkillCard({ skill, isSelected, onClick }: SkillCardProps
             />
             <h3 className={cn(
               "text-sm font-medium truncate",
-              isSelected ? "text-emerald-100" : "text-white/90"
+              isSelected ? "text-emerald-100" : "text-[var(--text-primary)]"
             )}>
               {skill.name}
             </h3>
           </div>
-          <p className="text-xs text-white/50 truncate mt-1">
+          <p className="text-xs text-[var(--text-secondary)] truncate mt-1">
             {skill.description || 'No description provided.'}
           </p>
         </div>

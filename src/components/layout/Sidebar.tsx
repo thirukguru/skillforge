@@ -1,5 +1,5 @@
 import React from 'react';
-import { BookOpen, Bot, Star, Folder, Settings, Plus } from 'lucide-react';
+import { BookOpen, Bot, Star, Folder, Settings, Plus, Scroll } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { TOOL_SOURCES, getToolColor } from '../../lib/toolSources';
 import { useAppStore } from '../../stores/appStore';
@@ -15,8 +15,9 @@ export default function Sidebar() {
     addCollection
   } = useAppStore();
 
-  const allSkillsCount = skills.length;
+  const allSkillsCount = skills.filter(s => s.type === 'skill').length;
   const allAgentsCount = skills.filter(s => s.type === 'agent').length;
+  const allRulesCount = skills.filter(s => s.type === 'rule').length;
   const favoritesCount = Array.from(favorites).length;
 
   const getToolCount = (toolSource: string) => skills.filter(s => s.toolSource === toolSource).length;
@@ -29,11 +30,11 @@ export default function Sidebar() {
   };
 
   return (
-    <div className="w-56 h-full bg-[#1a1b1e] border-r border-white/5 flex flex-col">
+    <div className="w-56 h-full bg-[var(--bg-sidebar)] border-r border-[var(--border-1)] flex flex-col">
       <div className="flex-1 overflow-y-auto overflow-x-hidden py-4 custom-scrollbar">
         {/* Library Section */}
         <div className="mb-6 px-3">
-          <h2 className="text-[10px] font-semibold text-white/40 uppercase tracking-wider mb-2 px-2">
+          <h2 className="text-[10px] font-semibold text-[var(--text-tertiary)] uppercase tracking-wider mb-2 px-2">
             Library
           </h2>
           <div className="space-y-0.5">
@@ -44,15 +45,22 @@ export default function Sidebar() {
               isActive={filterMode === 'all-skills'}
               onClick={() => { setFilterMode('all-skills'); setShowSettings(false); }}
             />
-            <NavItem 
-              icon={<Bot className="w-4 h-4" />} 
-              label="All Agents" 
+            <NavItem
+              icon={<Bot className="w-4 h-4" />}
+              label="All Agents"
               count={allAgentsCount}
               isActive={filterMode === 'all-agents'}
               onClick={() => { setFilterMode('all-agents'); setShowSettings(false); }}
             />
-            <NavItem 
-              icon={<Star className="w-4 h-4" />} 
+            <NavItem
+              icon={<Scroll className="w-4 h-4" />}
+              label="All Rules"
+              count={allRulesCount}
+              isActive={filterMode === 'all-rules'}
+              onClick={() => { setFilterMode('all-rules'); setShowSettings(false); }}
+            />
+            <NavItem
+              icon={<Star className="w-4 h-4" />}
               label="Favorites" 
               count={favoritesCount}
               isActive={filterMode === 'favorites'}
@@ -63,7 +71,7 @@ export default function Sidebar() {
 
         {/* Tools Section */}
         <div className="mb-6 px-3">
-          <h2 className="text-[10px] font-semibold text-white/40 uppercase tracking-wider mb-2 px-2">
+          <h2 className="text-[10px] font-semibold text-[var(--text-tertiary)] uppercase tracking-wider mb-2 px-2">
             Tools
           </h2>
           <div className="space-y-0.5">
@@ -87,7 +95,7 @@ export default function Sidebar() {
 
         {/* Collections Section */}
         <div className="mb-6 px-3">
-          <h2 className="text-[10px] font-semibold text-white/40 uppercase tracking-wider mb-2 px-2">
+          <h2 className="text-[10px] font-semibold text-[var(--text-tertiary)] uppercase tracking-wider mb-2 px-2">
             Collections
           </h2>
           <div className="space-y-0.5">
@@ -103,7 +111,7 @@ export default function Sidebar() {
             ))}
             <button 
               onClick={handleNewCollection}
-              className="w-full flex items-center gap-2 px-2 py-1.5 text-sm text-white/40 hover:text-white hover:bg-white/5 rounded-md transition-colors mt-1"
+              className="w-full flex items-center gap-2 px-2 py-1.5 text-sm text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-1)] rounded-md transition-colors mt-1"
             >
               <Plus className="w-4 h-4" />
               <span>New Collection</span>
@@ -113,10 +121,11 @@ export default function Sidebar() {
       </div>
 
       {/* Bottom Actions */}
-      <div className="p-3 border-t border-white/5 mt-auto">
-        <button 
+      <div className="p-3 border-t border-[var(--border-1)] mt-auto">
+        <button
           onClick={() => setShowSettings(true)}
-          className="w-full flex items-center gap-2 px-2 py-2 text-sm text-white/60 hover:text-white hover:bg-white/5 rounded-md transition-colors"
+          title={`Settings (${navigator.platform.toUpperCase().includes('MAC') ? '⌘' : 'Ctrl+'},)`}
+          className="w-full flex items-center gap-2 px-2 py-2 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-1)] rounded-md transition-colors"
         >
           <Settings className="w-4 h-4" />
           <span>Settings</span>
@@ -141,8 +150,8 @@ function NavItem({ icon, label, count, isActive, onClick }: NavItemProps) {
       className={cn(
         "w-full flex items-center justify-between px-2 py-1.5 rounded-md text-sm transition-colors",
         isActive 
-          ? "bg-white/10 text-white font-medium" 
-          : "text-white/60 hover:bg-white/5 hover:text-white"
+          ? "bg-[var(--surface-2)] text-[var(--text-primary)] font-medium" 
+          : "text-[var(--text-secondary)] hover:bg-[var(--surface-1)] hover:text-[var(--text-primary)]"
       )}
     >
       <div className="flex items-center gap-2 truncate">
@@ -154,7 +163,7 @@ function NavItem({ icon, label, count, isActive, onClick }: NavItemProps) {
       {typeof count !== 'undefined' && (
         <span className={cn(
           "text-xs px-1.5 py-0.5 rounded-full flex-shrink-0",
-          isActive ? "bg-white/10 text-white/90" : "bg-white/5 text-white/40"
+          isActive ? "bg-[var(--surface-2)] text-[var(--text-primary)]" : "bg-[var(--surface-1)] text-[var(--text-tertiary)]"
         )}>
           {count}
         </span>

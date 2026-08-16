@@ -22,7 +22,7 @@ export default function ToolBadge({ toolId, size = 'sm', showName = false }: Too
         style={{ backgroundColor: color }}
       />
       {showName && (
-        <span className="text-xs text-white/70 group-hover:text-white transition-colors">
+        <span className="text-xs text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">
           {source?.name || toolId}
         </span>
       )}
