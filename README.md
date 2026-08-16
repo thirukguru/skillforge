@@ -116,15 +116,13 @@ skillforge/
 
 Electron 43 · React 19 · Vite · Tailwind CSS v4 · Zustand · CodeMirror · react-markdown · chokidar · electron-store · electron-builder
 
-## Notes on signed builds
+## Code signing
 
-Packaged apps are **ad-hoc signed** but **not notarized** (that needs a paid
-Apple Developer ID / Windows code-signing certificate). On first launch of a
-downloaded build:
-
-- **macOS** — right-click → **Open** (or `xattr -dr com.apple.quarantine <App>`)
-- **Windows** — SmartScreen → **More info → Run anyway**
-- **Linux** — `chmod +x` the AppImage
+Builds are **not yet signed or notarized** (that needs a paid Apple Developer ID
+/ Windows certificate). Running in development or a locally-built app opens
+normally; a packaged app you distribute will show a first-launch Gatekeeper
+(macOS) or SmartScreen (Windows) prompt. Signing & notarization are on the
+roadmap.
 
 ## License
 
